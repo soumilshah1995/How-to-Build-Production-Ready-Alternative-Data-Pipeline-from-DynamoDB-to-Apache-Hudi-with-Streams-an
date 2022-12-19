@@ -1,7 +1,5 @@
 How to Build Production Ready Alternative Data Pipeline from DynamoDB to Apache Hudi with Streams and Firehose and Glue with Infrasture Code
 
-
-
 * Create a batch-oriented pipeline to sync the data from your DynamoDB tables into Apache HUDI. This project assists you in bringing data from DynamoDB into Apache HUDI tables for analytical workloads and building data lake houses. DynamoDB can keep a year of operational data and history in Datalake. Customers that want to bring data where time is not an issue can run the Glue job at 1 hour or 1 day intervals based on their SLA and get data into Apache HUDI. This method is also less expensive than glue stream processing architecture that I demonstrated before. Again depending upon use cases and how fast you want the data and cost aspects choose your architecture.
 
 
@@ -17,12 +15,14 @@ npx serverless plugin install -n serverless-plugin-resource-tagging
 npx sls deploy
 ```
 
-### I will add code soon 
+# I will add code soon 
 
-##### Streaming Architecture 
+## Streaming Architecture 
 ##### Build production Ready Real Time Transaction Hudi Datalake from DynamoDB Streams using Glue &kinesis
 ##### Video: https://www.youtube.com/watch?v=cWmRZ9WOZB8&t=464s
 ##### Code: https://github.com/soumilshah1995/dynamodb-hudi-stream-project
+
+
 
 Also, I have a full HUDI playlist on YouTube with over 15+ videos about Apache HUDI. If you have any questions about HUDI or Glue, please reach out. I am delighted to connect and discuss more.
 
