@@ -1,0 +1,127 @@
+service: dynamodb-streams-datalake2
+frameworkVersion: '3'
+
+provider:
+  name: aws
+  runtime: python3.7
+  memorySize: 512
+  timeout: 600
+  architecture: x86_64
+  stackTags:
+    jt-product: datateam
+    env: qa
+    created-date: 2022-09-09
+    team: data
+    customer-impact: false
+    terraform: false
+    role: serverless
+
+plugins:
+  - serverless-lift
+  - serverless-dotenv-plugin
+  - serverless-plugin-resource-tagging
+
+
+useDotenv: true
+
+package:
+  patterns:
+    - '!node_modules/**'
+    - '!package-lock.json'
+    - '!package.json'
+    - '!.env'
+
+functions:
+  lambda:
+    name: ${env:LAMBDA_NAME}
+    handler: lambda_function.lambda_handler
+    description: script to transform datastream and output to firehose
+
+
+resources:
+  Resources:
+
+    S3Bucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: ${env:BUCKET_NAME}
+
+    KinesisDataStreams:
+      Type: AWS::Kinesis::Stream
+      Properties:
+        Name: ${env:StreamName}
+        RetentionPeriodHours: ${env:RetentionPeriodHours}
+        StreamModeDetails:
+          StreamMode: ON_DEMAND
+
+    KinesisFireHose:
+      Type: AWS::KinesisFirehose::DeliveryStream
+      Properties:
+        DeliveryStreamName: ${env:DeliveryStreamName}
+        DeliveryStreamType: KinesisStreamAsSource
+        KinesisStreamSourceConfiguration:
+          KinesisStreamARN: !GetAtt KinesisDataStreams.Arn
+          RoleARN: ${env:KINESIS_ROLE}
+        ExtendedS3DestinationConfiguration:
+          BucketARN: !GetAtt S3Bucket.Arn
+          CompressionFormat: UNCOMPRESSED
+          DynamicPartitioningConfiguration:
+            Enabled: true
+            RetryOptions:
+              DurationInSeconds: 300
+          Prefix: "data/table_name=oltp/year=!{partitionKeyFromLambda:year}/month=!{partitionKeyFromLambda:month}/day=!{partitionKeyFromLambda:day}/"
+          ErrorOutputPrefix: "data/errors/table_name=oltp/year=!{timestamp:yyyy}/month=!{timestamp:MM}/day=!{timestamp:dd}/!{firehose:error-output-type}/"
+          RoleARN: ${env:KINESIS_ROLE}
+          ProcessingConfiguration:
+            Enabled: true
+            Processors:
+              - Parameters:
+                  - ParameterName: LambdaArn
+                    ParameterValue:  arn:aws:lambda:${aws:region}:${aws:accountId}:function:${env:LAMBDA_NAME}
+                Type: Lambda
+
+    DynamoDBTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: ${env:DYNAMO_DB_TABLE_NAME}
+        StreamSpecification:
+          StreamViewType: NEW_IMAGE
+        AttributeDefinitions:
+          - AttributeName: pk
+            AttributeType: S
+          - AttributeName: sk
+            AttributeType: S
+        KeySchema:
+          - AttributeName: pk
+            KeyType: HASH
+          - AttributeName: sk
+            KeyType: RANGE
+        BillingMode: PAY_PER_REQUEST
+        TableClass: STANDARD
+        PointInTimeRecoverySpecification:
+          PointInTimeRecoveryEnabled: true
+        KinesisStreamSpecification:
+          StreamArn: !GetAtt KinesisDataStreams.Arn
+
+    GlueDatabase:
+      Type: AWS::Glue::Database
+      Properties:
+        CatalogId: ${env:ACCOUNT}
+        DatabaseInput:
+          Name: ${env:DB_NAME}
+
+    TableGlueCrawlerAthena:
+      Type: AWS::Glue::Crawler
+      Properties:
+        DatabaseName: ${env:DB_NAME}
+        Name: ${env:CRAWLER_NAME_S3}
+        RecrawlPolicy:
+          RecrawlBehavior: CRAWL_EVERYTHING
+        Role: ${env:ROLE}
+        SchemaChangePolicy:
+          DeleteBehavior: DEPRECATE_IN_DATABASE
+          UpdateBehavior: "LOG"
+        Targets:
+          S3Targets:
+            - Path: ${env:CRAWLER_TARGET_PATH}
+        Configuration: "{\"Version\":1.0,\"CrawlerOutput\":{\"Tables\":{\"AddOrUpdateBehavior\":\"MergeNewColumns\"}}}"
