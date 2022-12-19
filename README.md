@@ -5,7 +5,7 @@
 ![dynamodbstreams drawio](https://user-images.githubusercontent.com/39345855/208463603-7b93a4d5-1037-47fd-83c7-9d59e3a02c4a.png)
 
 
-#### Steps 
+## Steps to Deploy Stack 
 
 ```
 npx serverless plugin install -n serverless-lift
@@ -16,11 +16,10 @@ npx sls deploy
 
 # I will add code soon 
 
-## Streaming Architecture 
+# Streaming Architecture 
 ##### Build production Ready Real Time Transaction Hudi Datalake from DynamoDB Streams using Glue &kinesis
 ##### Video: https://www.youtube.com/watch?v=cWmRZ9WOZB8&t=464s
 ##### Code: https://github.com/soumilshah1995/dynamodb-hudi-stream-project
-
 
 
 Also, I have a full HUDI playlist on YouTube with over 15+ videos about Apache HUDI. If you have any questions about HUDI or Glue, please reach out. I am delighted to connect and discuss more.
