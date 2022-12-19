@@ -14,8 +14,6 @@ npx serverless plugin install -n serverless-plugin-resource-tagging
 npx sls deploy
 ```
 
-# I will add code soon 
-
 # Streaming Architecture 
 ##### Build production Ready Real Time Transaction Hudi Datalake from DynamoDB Streams using Glue &kinesis
 ##### Video: https://www.youtube.com/watch?v=cWmRZ9WOZB8&t=464s
