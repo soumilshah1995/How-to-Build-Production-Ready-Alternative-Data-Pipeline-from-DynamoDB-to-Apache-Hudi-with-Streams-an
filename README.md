@@ -5,8 +5,11 @@
 ![dynamodbstreams drawio](https://user-images.githubusercontent.com/39345855/208463603-7b93a4d5-1037-47fd-83c7-9d59e3a02c4a.png)
 
 
-## Steps to Deploy Stack 
+# Steps to Deploy Stack 
+## Step 1:
+* Change the Enviroment Var and create IAM role for Kinesis Firehose and add ARN in .env File 
 
+## Step 2
 ```
 npx serverless plugin install -n serverless-lift
 npx serverless plugin install -n serverless-dotenv-plugin
