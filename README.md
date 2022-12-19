@@ -7,7 +7,28 @@
 
 # Steps to Deploy Stack 
 ## Step 1:
+
 * Change the Enviroment Var and create IAM role for Kinesis Firehose and add ARN in .env File 
+![image](https://user-images.githubusercontent.com/39345855/208479118-565aff1b-c0e8-481e-8826-e8dc71903dc4.png)
+
+![image](https://user-images.githubusercontent.com/39345855/208479372-31dffe50-338f-45c6-a750-00acfb1df523.png)
+
+```
+
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "firehose.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
+```
+
 
 ## Step 2
 ```
